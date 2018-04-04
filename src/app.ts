@@ -1,81 +1,71 @@
-import * as readline from 'readline-sync';
+import * as express from "express"
 import Block from "./estructure/block";
 import BlockChain from "./estructure/blockChain";
+import BlockChainStatus from "./views/BlockChainStatus"
+import * as path from "path";
+import * as bodyParser from "body-parser";
 
-console.log("Bem Vindo ao BlockChain Structure");
+var app = express();
+app.use(bodyParser.json())
 
-var difficulty: number = -1;
-do {
-	let escolha = readline.question("Escolha uma dificuldade para sua blockchain entre 1 e 5: ");
+let difficulty = 1;
+var chain : BlockChain<string>;
 
-	difficulty = Number(escolha) ? Number(escolha) : -1;
+app.get("/", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/index.html'));
+})
 
-} while (difficulty <= 0 || difficulty > 5);
+app.get("/js/angular", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/angular.min.js'));
+});
 
-console.log("Digite o valor do bloco Gênesis");
+app.get("/css/bootstrap", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/css/bootstrap.css'));
+});
 
-var tInicio = Date.now();
-var chain = new BlockChain<string>(readline.question("> "), difficulty);
-var tFim = Date.now();
+app.post("/api/init", (req, res) => {
 
-console.log("O bloco gênesis é: ");
-chain.getGenesisBlock().printBlock();
-console.log();
-console.log("Esse bloco demorou " + (tFim - tInicio) + " ms para ser criado: ", );
-console.log();
+	let t1 = Date.now();
 
-var opcao: number = 0;
-do {
-	console.log("Escolha dentre uma das opções abaixo");
-	console.log("1 - Adicionar Bloco");
-	console.log("2 - Ver último bloco");
-	console.log("3 - Ver primeiro bloco");
-	console.log("4 - Ver todos os blocos");
-	console.log("5 - Ver dificuldade");
-	console.log("9 - Limpar  console");
-	console.log("0 - Sair");
-	console.log(">");
+	difficulty = req.body.difficulty;
+	let data = req.body.data;
+	chain = new BlockChain<string>(data, difficulty);
 
-	let escolha = readline.question("> ");
+	let t2 = Date.now();
 
-	opcao = Number(escolha) ? Number(escolha) : -1;
+	res.send(new BlockChainStatus("BlockChain criada com sucesso", t2 - t1));
+});
 
-	switch (opcao) {
-		case 1:
-			console.log("Digite o valor do bloco");
-			tInicio = Date.now();
-			chain.addBlock(readline.question("> "), difficulty);
-			tFim = Date.now();
+app.get("/api/blocks", (req, res) => {
 
-			console.log();
-			console.log("O bloco inserido foi: ");
-			chain.getLastBlock().printBlock();
-			console.log();
-			console.log("Esse bloco demorou " + (tFim - tInicio) + " ms para ser criado: ", );
-			console.log();
+	if (chain) res.send(chain.getBlocks());
 
-			break;
-		case 2:
-			console.log("O último bloco é: ");
-			chain.getLastBlock().printBlock();
-			console.log();
-			break;
-		case 3:
-			console.log("O primeiro bloco é: ");
-			chain.getGenesisBlock().printBlock();
-			console.log();
-			break;
-		case 4:
-			chain.printChain();
-			console.log();
-			break;
-		case 5:
-			console.log("A dificuldade dessa BlockChain é: " + difficulty);
-			console.log();
-			break;
-		case 9:
-			console.clear();
-			break;
-	}
-} while (opcao > 0);
-console.log("Byeeee");
+	else[];
+})
+
+app.post("/api/blocks", (req, res) => {
+
+	let data = req.body.data;
+	let t1 = Date.now();
+
+	chain.addBlock(data, difficulty);
+
+	let t2 = Date.now();
+
+	res.send(new BlockChainStatus("Bloco adicionado com sucesso", t2 - t1));
+});
+
+app.put("/api/blocks/:hash", (req, res) =>{
+	
+	let hash = req.params.hash;
+	let data = req.body.data;
+
+	let t1 = Date.now();
+	chain.editBlock(hash, data);
+	let t2 = Date.now();
+
+	res.send(new BlockChainStatus("Um bloco foi atualizado e alterou toda a blockchain", t2 - t1))
+
+});
+
+app.listen(3000, () => { });  

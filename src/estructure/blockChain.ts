@@ -16,7 +16,7 @@ export default class BlockChain<T> {
 	public getLastBlock(){
 		if(this.blocks.length > 0) return this.blocks[this.blocks.length - 1];
 
-		else if (this.blocks.length == 0) return this.blocks[this.blocks.length];
+		else if (this.blocks.length == 0) return this.getGenesisBlock();
 
 		else return null;
 	}
@@ -26,14 +26,32 @@ export default class BlockChain<T> {
 
 		var newBlock = new Block<T>(data, last, difficult);
 		
-		newBlock.blockHeigth = last.blockHeigth ? last.blockHeigth + 1 : 0;
+		newBlock.blockHeigth = last ? last.blockHeigth + 1 : 0;
 
 		this.blocks.push(newBlock);
+	}
+
+	public editBlock(hash : string, data : T){
+
+		let editedBlockIndex = this.blocks.findIndex((element) => {
+			return element.hash == hash;
+		});
+
+		this.blocks[editedBlockIndex].data = data;
+		for(let i = editedBlockIndex; i < this.blocks.length; i++){
+			this.blocks[i].mine();
+		}
 	}
 
 	public printChain(){
 		this.blocks.forEach(block => {
 			block.printBlock();
+		});
+	}
+
+	public getBlocks(){
+		return this.blocks.map(block => {
+			return JSON.parse(block.toString());
 		});
 	}
 }

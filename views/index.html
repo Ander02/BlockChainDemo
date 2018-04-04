@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>BlockChain</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="/css/bootstrap" rel="stylesheet">
+	<script src="/js/angular"></script>
+
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		h1 {
+			text-align: center;
+		}
+
+		body {
+			width: 95%;
+			margin: 0 auto;
+		}
+
+		.no-margin {
+			margin: 0;
+		}
+
+		.lineButtonForm {
+			margin-top: 1.5rem;
+		}
+
+		.row {
+			margin: 0 auto;
+		}
+
+		.card {
+			margin-top: 15px;
+			margin-bottom: 15px;
+		}
+
+		.content {
+			height: 75vh;
+			overflow: auto;
+			margin-bottom: 1cm;
+		}
+	</style>
+
+</head>
+
+<body ng-app="app">
+
+	<div ng-controller="BlockChain">
+
+		<h1>BlockChain</h1>
+		<div>
+			<div class="form-control form-row no-margin" ng-show="blocks.length <= 0">
+				<div class="from-group col-md-1">
+					<label for="genesisBlockDifficulty">Difficulty</label>
+					<input class="form-control" id="genesisBlockDifficulty" name="genesisBlockDifficulty" type="number" placeholder="difficulty"
+					 ng-model="genesis.difficulty" />
+				</div>
+				<div class="from-group col-md-10">
+					<label for="genesisBlockData">Data</label>
+					<input class="form-control" id="genesisBlockData" name="genesisBlockData" type="text" placeholder="Data" ng-model="genesis.data"
+					/>
+				</div>
+				<div class="col-md-1">
+					<button class="btn btn-primary btn-lg btn-block lineButtonForm" ng-click="initBlockChain()">Init</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="content" class="content">
+			<div class="row" ng-show="blocks.length > 0">
+				<div class="col-sm-3" ng-repeat="item in blocks">
+					<div class="card border-dark">
+						<div class="card-header">
+							<b>Hash</b>
+							<i ng-bind="item.hash"></i>
+						</div>
+						<div class="card-body">
+							<div class="list-group list-group-flush">
+
+								<li class="list-group-item">
+									<p class="card-text">
+										<b>Block Heigth:</b> {{item.blockHeigth}}
+									</p>
+								</li>
+								<li class="list-group-item">
+									<p class="card-text">
+										<b>TimeStamp:</b> {{item.timestamp}}
+									</p>
+								</li>
+								<li class="list-group-item">
+									<p class="card-text">
+										<b>Difficulty:</b> {{item.difficulty}}
+									</p>
+								</li>
+								<li class="list-group-item">
+									<p class="card-text">
+										<b>Data:</b> <input type="text" ng-value="item.data">
+									</p>
+								</li>
+								<li class="list-group-item">
+									<p class="card-text">
+										<b>Nonce:</b> {{item.nonce}}
+									</p>
+								</li>
+							</div>
+						</div>
+						<div class="card-footer">
+							<b>Previous Hash</b> {{item.previousHash}}
+						</div>
+						<div class="card-footer">
+							<button class="btn btn-primary btn-block" ng-change="editBlock(item.hash, item.data)">Editar</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-control form-row no-margin" ng-show="blocks.length > 0">
+			<div class="form-group col-md-11">
+				<label for="newBlockData">Data</label>
+				<input class="form-control" id="newBlockData" name="newBlockData" type="text" placeholder="Data" ng-model="newBlock.data"
+				 ng-required="true">{{newBlock}}
+			</div>
+			<div class="col-md-1">
+				<button class="btn btn-primary btn-lg btn-block lineButtonForm" ng-click="addBlock()">Add Block</button>
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		var app = angular.module("app", []);
+
+		app.controller('BlockChain', function BlockChainController($scope, $http) {
+			$scope.blocks = [];
+
+			$scope.getAllBlocks = () => $http.get("/api/blocks").then((sucess) => {
+				$scope.blocks = [];
+
+				sucess.data.forEach(block => {
+					$scope.blocks.push(block);
+				});
+				console.log($scope.blocks);
+			}, (error) => {
+
+			});
+
+			$scope.initBlockChain = () => {
+				$http.post("/api/init", $scope.genesis).then((sucess) => {
+
+					$scope.getAllBlocks();
+					console.log(sucess.data);
+
+					$scope.genesis = undefined;
+
+				}, (error) => {
+
+				})
+			}
+
+			$scope.addBlock = () => {
+				$http.post("/api/blocks", $scope.newBlock).then((sucess) => {
+
+					$scope.getAllBlocks();
+					$scope.newBlock.data = "";
+					console.log(sucess.msg);
+
+					let content = document.getElementById("content");
+					content.scrollTop = content.scrollHeight;
+
+				}, (error) = {
+
+				});
+			}
+
+			$scope.editBlock = (hash, data) => {
+				$http.put("/api/blocks/" + hash, { data: data }).then((sucess) => {
+
+					console.log(sucess);
+					$scope.getAllBlocks();
+				}, (error) => {
+
+				})
+			}
+		});
+	</script>
+</body>
+
+</html>
