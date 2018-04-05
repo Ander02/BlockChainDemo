@@ -6,57 +6,11 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>BlockChain</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="/css/bootstrap" rel="stylesheet">
-	<link href="/css/toastr" rel="stylesheet">
-	<script src="/js/angular"></script>
-	<script src="/js/toastr"></script>
-	<script src="/js/socketIO"></script>
-
-	<style>
-		* {
-			margin: 0;
-			padding: 0;
-		}
-
-		h1 {
-			text-align: center;
-		}
-
-		body {
-			width: 95%;
-			margin: 0 auto;
-		}
-
-		.no-margin {
-			margin: 0;
-		}
-
-		.lineButtonForm {
-			margin-top: 1.5rem;
-		}
-
-		.row {
-			margin: 0 auto;
-		}
-
-		.card {
-			margin-top: 15px;
-			margin-bottom: 15px;
-		}
-
-		.content {
-			height: 70vh;
-			overflow: auto;
-			margin-bottom: 0.5cm;
-		}
-
-		.itemData {
-			display: flex;
-			flex-direction: initial;
-		}
-
-	</style>
-
+	<!-- CSS -->
+	<link href="/css/lib/bootstrap" rel="stylesheet">
+	<link href="/css/lib/toastr" rel="stylesheet">
+	<link href="/css/style" rel="stylesheet">
+		
 </head>
 
 <body ng-app="app">
@@ -76,7 +30,7 @@
 					<label for="genesisBlockData">Data</label>
 					<textarea rows="1" class="form-control" id="genesisBlockData" name="genesisBlockData" type="text" placeholder="Data" ng-model="genesis.data"></textarea>
 				</div>
-					<button class="btn btn-primary btn-lg btn-block lineButtonForm" ng-click="initBlockChain()">Init</button>
+				<button class="btn btn-primary btn-lg btn-block lineButtonForm" ng-click="initBlockChain()">Init</button>
 			</div>
 		</div>
 
@@ -138,104 +92,16 @@
 				<label for="newBlockData">Data</label>
 				<textarea class="form-control" id="newBlockData" name="newBlockData" type="text" placeholder="Data" ng-model="newBlock.data"></textarea>
 			</div>
-				<button class="btn btn-primary btn-lg btn-block lineButtonForm" ng-click="addBlock()">Add Block</button>
+			<button class="btn btn-primary btn-lg btn-block lineButtonForm" ng-click="addBlock()">Add Block</button>
 		</div>
 	</div>
 
-	<script>
-
-		const app = angular.module("app", ['toastr']);
-
-		app.controller('BlockChain', ($scope, $http, toastr) => {
-
-			const socket = io.connect('http://localhost:3000');
-
-			socket.on('chainUpdate', (data) => {
-				if (data) $scope.getAllBlocks();
-			})
-
-			$scope.blocks = [];
-			$scope.getAllBlocks = () => $http.get("/api/blocks").then((success) => {
-				$scope.blocks = [];
-
-				success.data.forEach(block => {
-					$scope.blocks.push(block);
-				});
-
-			}, (error) => {
-
-			});
-
-			$scope.initBlockChain = () => {
-				$http.post("/api/init", $scope.genesis).then((success) => {
-
-					$scope.getAllBlocks();
-
-					$scope.genesis = undefined;
-
-					toastr.info("Criada em " + success.data.time + "ms", success.data.msg);
-
-					socket.emit('update', true);
-
-				}, (error) => {
-
-				})
-			}
-
-			$scope.newBlock = {};
-			$scope.addBlock = () => {
-				$http.post("/api/blocks", $scope.newBlock).then((success) => {
-
-					$scope.getAllBlocks();
-					$scope.newBlock.data = "";
-
-					let content = document.getElementById("content");
-					content.scrollTop = content.scrollHeight;
-
-					toastr.success("Criado em " + success.data.time + "ms", success.data.msg);
-
-					socket.emit('update', true);
-
-				}, (error) = {
-
-				});
-			}
-
-			$scope.editBlock = (hash, data) => {
-				$http.put("/api/blocks/" + hash, { data: data }).then((success) => {
-
-					$scope.getAllBlocks();
-					toastr.error("Editado em " + success.data.time + "ms", success.data.msg);
-
-					socket.emit('update', true);
-
-				}, (error) => {
-
-				});
-			}
-
-			$scope.restartChain = () => {
-				$http.post("/api/restart", $scope.newBlock).then((success) => {
-
-					$scope.getAllBlocks();
-
-					toastr.warning("Reiniciada em " + success.data.time + "ms", success.data.msg);
-
-					socket.emit('update', true);
-
-				}, (error) = {
-
-				});
-			}
-
-			window.onload = () => {
-				console.log("Iniciando...");
-				$scope.getAllBlocks();
-				console.log("Iniciado!");
-			}
-
-		});
-	</script>
+	<!-- JS -->
+	<script src="/js/lib/angular"></script>
+	<script src="/js/lib/toastr"></script>
+	<script src="/js/lib/socketIO"></script>
+	<script src="/js/app"></script>
+	
 </body>
 
 </html>

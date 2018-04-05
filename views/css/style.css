@@ -1,0 +1,41 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+h1 {
+	text-align: center;
+}
+
+body {
+	width: 95%;
+	margin: 0 auto;
+}
+
+.no-margin {
+	margin: 0;
+}
+
+.lineButtonForm {
+	margin-top: 1.5rem;
+}
+
+.row {
+	margin: 0 auto;
+}
+
+.card {
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+.content {
+	height: 70vh;
+	overflow: auto;
+	margin-bottom: 0.5cm;
+}
+
+.itemData {
+	display: flex;
+	flex-direction: initial;
+}

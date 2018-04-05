@@ -31,25 +31,32 @@ app.get("/", (req, res) => {
 	res.sendFile(path.join(__dirname + '/../views/index.html'));
 })
 
-app.get("/js/angular", (req, res) => {
-	res.sendFile(path.join(__dirname + '/../views/js/angular.min.js'));
+app.get("/js/app", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/js/app.js'));
 });
 
-app.get("/js/toastr", (req, res) => {
-	res.sendFile(path.join(__dirname + '/../views/js/angular-toastr.tpls.js'));
+app.get("/js/lib/angular", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/js/lib/angular.min.js'));
 });
 
-app.get("/js/socketIO", (req, res) => {
-	res.sendFile(path.join(__dirname + '/../views/js/socket.io.js'));
+app.get("/js/lib/toastr", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/js/lib/angular-toastr.tpls.js'));
 });
 
-
-app.get("/css/bootstrap", (req, res) => {
-	res.sendFile(path.join(__dirname + '/../views/css/bootstrap.css'));
+app.get("/js/lib/socketIO", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/js/lib/socket.io.js'));
 });
 
-app.get("/css/toastr", (req, res) => {
-	res.sendFile(path.join(__dirname + '/../views/css/angular-toastr.css'));
+app.get("/css/lib/bootstrap", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/css/lib/bootstrap.css'));
+});
+
+app.get("/css/lib/toastr", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/css/lib/angular-toastr.css'));
+});
+
+app.get("/css/style", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/css/style.css'));
 });
 
 app.post("/api/init", (req, res) => {
