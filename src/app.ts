@@ -65,6 +65,13 @@ app.post("/api/init", (req, res) => {
 	res.send(new BlockChainStatus("BlockChain criada com sucesso", t2 - t1));
 });
 
+app.post("/api/restart", (req, res) => {
+	let t1 = Date.now()
+	chain = null;
+	let t2 = Date.now()
+	res.send(new BlockChainStatus("A blockchain foi reiniciada", t2 - t1))
+});
+
 app.get("/api/blocks", (req, res) => {
 
 	if (chain) res.send(chain.getBlocks());

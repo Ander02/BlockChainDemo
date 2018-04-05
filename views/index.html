@@ -45,15 +45,16 @@
 		}
 
 		.content {
-			height: 75vh;
+			height: 70vh;
 			overflow: auto;
-			margin-bottom: 1cm;
+			margin-bottom: 0.5cm;
 		}
 
 		.itemData {
 			display: flex;
 			flex-direction: initial;
 		}
+
 	</style>
 
 </head>
@@ -63,6 +64,7 @@
 	<div ng-controller="BlockChain">
 
 		<h1>BlockChain</h1>
+
 		<div>
 			<div class="form-control form-row no-margin" ng-show="blocks.length <= 0">
 				<div class="from-group col-md-1">
@@ -70,19 +72,19 @@
 					<input class="form-control" id="genesisBlockDifficulty" name="genesisBlockDifficulty" type="number" placeholder="difficulty"
 					 min="1" max="10" ng-model="genesis.difficulty" />
 				</div>
-				<div class="from-group col-md-10">
+				<div class="from-group col-md-11">
 					<label for="genesisBlockData">Data</label>
-					<textarea class="form-control" id="genesisBlockData" name="genesisBlockData" type="text" placeholder="Data" ng-model="genesis.data"></textarea>
+					<textarea rows="1" class="form-control" id="genesisBlockData" name="genesisBlockData" type="text" placeholder="Data" ng-model="genesis.data"></textarea>
 				</div>
-				<div class="col-md-1">
 					<button class="btn btn-primary btn-lg btn-block lineButtonForm" ng-click="initBlockChain()">Init</button>
-				</div>
 			</div>
 		</div>
 
 		<div id="content" class="content" ng-show="blocks.length > 0">
+			<button class="btn btn-danger btn-block" ng-click="restartChain()">Reiniciar</button>
+
 			<div class="row">
-				<div class="col-sm-4" ng-repeat="item in blocks">
+				<div class="col-sm-3" ng-repeat="item in blocks">
 					<div class="card border-dark">
 						<div class="card-header">
 							<b>Hash</b>
@@ -124,31 +126,29 @@
 							<i>{{item.previousHash}}</i>
 						</div>
 						<div class="card-footer">
-							<button class="btn btn-primary btn-block" ng-click="editBlock(item.hash, item.data)">Editar</button>
+							<button class="btn btn-info btn-block" ng-click="editBlock(item.hash, item.data)">Editar</button>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div class="form-control form-row no-margin" ng-show="blocks.length > 0">
-			<div class="form-group col-md-11">
+		<div class="form-control no-margin" ng-show="blocks.length > 0">
+			<div class="form-group">
 				<label for="newBlockData">Data</label>
 				<textarea class="form-control" id="newBlockData" name="newBlockData" type="text" placeholder="Data" ng-model="newBlock.data"></textarea>
 			</div>
-			<div class="col-md-1">
 				<button class="btn btn-primary btn-lg btn-block lineButtonForm" ng-click="addBlock()">Add Block</button>
-			</div>
 		</div>
 	</div>
 
 	<script>
 
-		var app = angular.module("app", ['toastr']);
+		const app = angular.module("app", ['toastr']);
 
 		app.controller('BlockChain', ($scope, $http, toastr) => {
 
-			var socket = io.connect('http://localhost:3000');
+			const socket = io.connect('http://localhost:3000');
 
 			socket.on('chainUpdate', (data) => {
 				if (data) $scope.getAllBlocks();
@@ -202,7 +202,6 @@
 			}
 
 			$scope.editBlock = (hash, data) => {
-				console.log(hash, data)
 				$http.put("/api/blocks/" + hash, { data: data }).then((success) => {
 
 					$scope.getAllBlocks();
@@ -211,6 +210,20 @@
 					socket.emit('update', true);
 
 				}, (error) => {
+
+				});
+			}
+
+			$scope.restartChain = () => {
+				$http.post("/api/restart", $scope.newBlock).then((success) => {
+
+					$scope.getAllBlocks();
+
+					toastr.warning("Reiniciada em " + success.data.time + "ms", success.data.msg);
+
+					socket.emit('update', true);
+
+				}, (error) = {
 
 				});
 			}
