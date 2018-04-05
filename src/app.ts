@@ -1,15 +1,31 @@
 import * as express from "express"
+import * as path from "path";
+import * as bodyParser from "body-parser";
+import * as socketIO from "socket.io";
+import * as http from "http";
+
 import Block from "./estructure/block";
 import BlockChain from "./estructure/blockChain";
 import BlockChainStatus from "./views/BlockChainStatus"
-import * as path from "path";
-import * as bodyParser from "body-parser";
 
-var app = express();
+const app = express();
 app.use(bodyParser.json())
+
+const server = http.createServer(app);
+const io = socketIO(server);
 
 let difficulty = 1;
 var chain: BlockChain<string>;
+
+io.on('connection', (socket) => {
+
+	console.log("Client Connected in the socket");
+
+	socket.on('update', (data) => {
+		socket.emit('chainUpdate', data);
+		socket.broadcast.emit('chainUpdate', data);
+	});
+});
 
 app.get("/", (req, res) => {
 	res.sendFile(path.join(__dirname + '/../views/index.html'));
@@ -22,6 +38,11 @@ app.get("/js/angular", (req, res) => {
 app.get("/js/toastr", (req, res) => {
 	res.sendFile(path.join(__dirname + '/../views/js/angular-toastr.tpls.js'));
 });
+
+app.get("/js/socketIO", (req, res) => {
+	res.sendFile(path.join(__dirname + '/../views/js/socket.io.js'));
+});
+
 
 app.get("/css/bootstrap", (req, res) => {
 	res.sendFile(path.join(__dirname + '/../views/css/bootstrap.css'));
@@ -74,4 +95,4 @@ app.put("/api/blocks/:hash", (req, res) => {
 	res.send(new BlockChainStatus("Um bloco foi atualizado e alterou toda a blockchain", t2 - t1))
 });
 
-app.listen(3000, () => { });  
+server.listen(3000, () => { });  

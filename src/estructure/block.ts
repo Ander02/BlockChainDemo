@@ -14,7 +14,8 @@ export default class Block<T> {
 		this.difficulty = difficulty;
 		this.timestamp = Date.now();
 		this.previousBlock = previousBlock;
-
+		this.blockHeigth = previousBlock ? previousBlock.blockHeigth + 1 : 0;
+		
 		this.mine();
 	}
 
@@ -29,7 +30,7 @@ export default class Block<T> {
 		while (this.hash.search("^(0){" + this.difficulty + "}") != 0) {
 			this.nonce++;
 			this.hash = this.generateSha256();
-			console.log(this.nonce, this.hash, this.timestamp);
+			console.log(this.toStringWithoutHash());
 		}
 	}
 
@@ -60,7 +61,7 @@ export default class Block<T> {
 		console.log(this.toString())
 	}
 
-	public equals(block : Block<T>){
+	public equals(block: Block<T>) {
 		// this.blockHeigth === block.blockHeigth;
 		// this.data === block.data;
 		// this.difficulty === block.difficulty;

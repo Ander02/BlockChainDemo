@@ -10,6 +10,7 @@
 	<link href="/css/toastr" rel="stylesheet">
 	<script src="/js/angular"></script>
 	<script src="/js/toastr"></script>
+	<script src="/js/socketIO"></script>
 
 	<style>
 		* {
@@ -142,11 +143,18 @@
 	</div>
 
 	<script>
+
 		var app = angular.module("app", ['toastr']);
 
 		app.controller('BlockChain', ($scope, $http, toastr) => {
-			$scope.blocks = [];
 
+			var socket = io.connect('http://localhost:3000');
+
+			socket.on('chainUpdate', (data) => {
+				if (data) $scope.getAllBlocks();
+			})
+
+			$scope.blocks = [];
 			$scope.getAllBlocks = () => $http.get("/api/blocks").then((success) => {
 				$scope.blocks = [];
 
@@ -167,6 +175,8 @@
 
 					toastr.info("Criada em " + success.data.time + "ms", success.data.msg);
 
+					socket.emit('update', true);
+
 				}, (error) => {
 
 				})
@@ -184,6 +194,8 @@
 
 					toastr.success("Criado em " + success.data.time + "ms", success.data.msg);
 
+					socket.emit('update', true);
+
 				}, (error) = {
 
 				});
@@ -196,6 +208,8 @@
 					$scope.getAllBlocks();
 					toastr.error("Editado em " + success.data.time + "ms", success.data.msg);
 
+					socket.emit('update', true);
+
 				}, (error) => {
 
 				});
@@ -204,6 +218,7 @@
 			window.onload = () => {
 				console.log("Iniciando...");
 				$scope.getAllBlocks();
+				console.log("Iniciado!");
 			}
 
 		});

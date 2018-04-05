@@ -15,12 +15,14 @@
 	"dependencies": {
 		"@types/express": "^4.11.1",
 		"@types/node": "^9.6.0",
+		"@types/socket.io": "^1.4.33",
 		"angular": "^1.6.9",
 		"body-parser": "^1.18.2",
 		"express": "^4.16.3",
 		"jade": "^1.11.0",
 		"npm": "^5.8.0",
 		"pug": "^2.0.3",
-		"readline-sync": "^1.4.9"
+		"readline-sync": "^1.4.9",
+		"socket.io": "^2.1.0"
 	}
 }

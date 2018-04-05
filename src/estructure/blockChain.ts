@@ -26,8 +26,6 @@ export default class BlockChain<T> {
 
 		var newBlock = new Block<T>(data, last, difficult);
 		
-		newBlock.blockHeigth = last ? last.blockHeigth + 1 : 0;
-
 		this.blocks.push(newBlock);
 	}
 
