@@ -54,4 +54,14 @@ export default class BlockChain<T> {
 			return JSON.parse(block.toString());
 		});
 	}
+
+	public equals(chain : BlockChain<T>){
+		
+		if(this.blocks.length != chain.blocks.length) return false;
+
+		else for(let i = 0; i < this.blocks.length; i++){
+			if(!this.blocks[i].equals(chain.blocks[i])) return false;
+		}
+		return true;
+	}
 }

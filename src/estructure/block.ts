@@ -29,6 +29,7 @@ export default class Block<T> {
 		while (this.hash.search("^(0){" + this.difficulty + "}") != 0) {
 			this.nonce++;
 			this.hash = this.generateSha256();
+			console.log(this.nonce, this.hash, this.timestamp);
 		}
 	}
 
@@ -57,5 +58,16 @@ export default class Block<T> {
 
 	public printBlock() {
 		console.log(this.toString())
+	}
+
+	public equals(block : Block<T>){
+		// this.blockHeigth === block.blockHeigth;
+		// this.data === block.data;
+		// this.difficulty === block.difficulty;
+		// this.hash === block.hash;
+		// this.nonce === block.nonce;
+		// this.previousBlock === block.previousBlock;
+		// this.timestamp=== block.timestamp;
+		return this.toString() === block.toString();
 	}
 }
